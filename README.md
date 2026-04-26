@@ -4,17 +4,17 @@ This repository is my personal lab for learning and implementing Concurrency in 
 
 ##  Roadmap & Progress
 
-- [x] **Goroutines**: Basic usage and the `main` goroutine lifecycle.
-- [x] **WaitGroups**: Coordinating multiple goroutines using `sync.WaitGroup`.
-- [ ] **Channels**: Communication between goroutines (Buffered vs. Unbuffered).
-- [ ] **Select Statement**: Managing multiple channel operations.
-- [ ] **Mutexes & RWMutex**: Handling Race Conditions and shared memory.
-- [ ] **Context Package**: Cancellation, Timeouts, and Deadlines.
-- [ ] **Concurrency Patterns**:
-    - [ ] Worker Pools
-    - [ ] Fan-out / Fan-in
-    - [ ] Pipelines
-    - [ ] Generators
+-  **Goroutines**: Basic usage and the `main` goroutine lifecycle.
+-  **WaitGroups**: Coordinating multiple goroutines using `sync.WaitGroup`.
+-  **Channels**: Communication between goroutines (Buffered vs. Unbuffered).
+-  **Select Statement**: Managing multiple channel operations.
+-  **Mutexes & RWMutex**: Handling Race Conditions and shared memory.
+   **Context Package**: Cancellation, Timeouts, and Deadlines.
+-  **Concurrency Patterns**:
+    -  Worker Pools
+    -  Fan-out / Fan-in
+    -  Pipelines
+    -  Generators
 
 ##  Project Structure
 
