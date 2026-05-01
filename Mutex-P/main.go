@@ -37,48 +37,77 @@ import (
 // }
 
 // A little tricky example of Mutex
-type Result struct {
-	URL    string
-	Status int
+// type Result struct {
+// 	URL    string
+// 	Status int
+// }
+
+// type ScraperReport struct {
+// 	mu      sync.Mutex
+// 	results map[string]int
+// }
+
+// func Worker(id int, jobs <-chan string, report *ScraperReport, wg *sync.WaitGroup) {
+// 	defer wg.Done()
+// 	for url := range jobs {
+// 		statusCode := 200
+
+// 		report.mu.Lock()
+// 		report.results[url] = statusCode
+// 		fmt.Printf("Worker %d saved status for %s\n", id, url)
+// 		report.mu.Unlock()
+// 	}
+// }
+
+// func main() {
+// 	report := &ScraperReport{
+// 		results: make(map[string]int),
+// 	}
+// 	jobs := make(chan string, 10)
+// 	var wg sync.WaitGroup
+
+// 	for w := 1; w <= 3; w++ {
+// 		wg.Add(1)
+// 		go Worker(w, jobs, report, &wg)
+// 	}
+// 	urls := []string{"google.com", "github.com", "golang.org", "medium.com"}
+// 	for _, url := range urls {
+// 		jobs <- url
+// 	}
+// 	close(jobs)
+
+// 	wg.Wait()
+// 	fmt.Println("Final report")
+// 	for url, status := range report.results {
+// 		fmt.Printf("%s: %d\n", url, status)
+// 	}
+// }
+
+// Now let's implement RW-Mutex
+type SessionStore struct {
+	mu       sync.RWMutex
+	sessions map[string]string
 }
 
-type ScraperReport struct {
-	mu      sync.Mutex
-	results map[string]int
+func (s *SessionStore) GetSession(user string) string {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.sessions[user]
 }
 
-func Worker(id int, jobs <-chan string, report *ScraperReport, wg *sync.WaitGroup) {
-	defer wg.Done()
-	for url := range jobs {
-		statusCode := 200
-
-		report.mu.Lock()
-		report.results[url] = statusCode
-		fmt.Printf("Worker %d saved status for %s\n", id, url)
-		report.mu.Unlock()
-	}
+func (s *SessionStore) UpdateSession(user, token string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.sessions[user] = token
 }
 
 func main() {
-	report := &ScraperReport{
-		results: make(map[string]int),
-	}
-	jobs := make(chan string, 10)
-	var wg sync.WaitGroup
+	store := SessionStore{sessions: make(map[string]string)}
+	fmt.Println("Logging in Alice")
+	store.UpdateSession("alice", "token_123")
 
-	for w := 1; w <= 3; w++ {
-		wg.Add(1)
-		go Worker(w, jobs, report, &wg)
-	}
-	urls := []string{"google.com", "github.com", "golang.org", "medium.com"}
-	for _, url := range urls {
-		jobs <- url
-	}
-	close(jobs)
-
-	wg.Wait()
-	fmt.Println("Final report")
-	for url, status := range report.results {
-		fmt.Printf("%s: %d\n", url, status)
-	}
+	token := store.GetSession("alice")
+	fmt.Println("Alice's session token: ", token)
+	empty := store.GetSession("uknown_user")
+	fmt.Println("Unknown user token: ", empty)
 }
